@@ -6,8 +6,9 @@ import serial
 import threading
 import time
 
+conf_path = '/home/pi/Documents/fridge_bot/config.ini' #edit here
 conf = configparser.ConfigParser()  # подключение конфига
-conf.read('config.ini')
+conf.read(conf_path)
 setting = conf['Setting']
 
 bot = telebot.TeleBot(setting['TOKEN'])

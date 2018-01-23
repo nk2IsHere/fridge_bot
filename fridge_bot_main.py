@@ -5,22 +5,23 @@ from telebot import types
 import serial
 import threading
 import time
+import logging
 
-conf_path = '/home/pi/Documents/fridge_bot/config.ini' #edit here
-conf = configparser.ConfigParser()  # подключение конфига
+conf_path = '/home/pi/Documents/fridge_bot/config.ini'  # path to config
+conf = configparser.ConfigParser()  # connect config
 conf.read(conf_path)
 setting = conf['Setting']
 
-bot = telebot.TeleBot(setting['TOKEN'])
-ser = serial.Serial(setting['PORT'], setting['BAUD'])
+bot = telebot.TeleBot(setting['TOKEN'])  # telegram bot setup
+ser = serial.Serial(setting['PORT'], setting['BAUD'])  # serial setup
 
-markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # main menu
 hide = types.ReplyKeyboardRemove()
 markup.row('🥛Молоко', '🥚Яйца')
 markup.row('⚙Настройки')
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start'])  # '/start' command handler
 def subscribe_chat(message):
     users = open('users.txt', 'r')
     if (str(message.chat.id) + '\n') in users:
@@ -34,7 +35,7 @@ def subscribe_chat(message):
     users.close()
 
 
-@bot.message_handler(func=lambda message: message.text == '🥚Яйца')
+@bot.message_handler(func=lambda message: message.text == '🥚Яйца')  # eggs handler
 def eggs_send(message):
     eggs = get_eggs()
     if eggs == "err":
@@ -45,7 +46,7 @@ def eggs_send(message):
     # bot.send_message(message.chat.id, 'Temperature: ' + temp + ' °C\n' + 'Time: ' + curtime)
 
 
-@bot.message_handler(func=lambda message: message.text == '🥛Молоко')
+@bot.message_handler(func=lambda message: message.text == '🥛Молоко')  # milk handler
 def milk_send(message):
     milk = get_milk()
     if milk == "err":
@@ -54,7 +55,7 @@ def milk_send(message):
         bot.send_message(message.chat.id, 'Осталось молока: ' + milk + ' мл')
 
 
-@bot.message_handler(func=lambda message: message.text == '⚙Настройки')
+@bot.message_handler(func=lambda message: message.text == '⚙Настройки')  # settings handler
 def setting_send(message):
     delay = setting['DELAY']
     bot.send_message(message.chat.id, 'Задержка уведомлений: ' + delay + ' минут')
@@ -62,37 +63,40 @@ def setting_send(message):
     bot.register_next_step_handler(message, delay_set)
 
 
-@bot.callback_query_handler(func=lambda c: True)
+@bot.callback_query_handler(func=lambda c: True)  # callback button for reconnect
 def reconnect(c):
     if c.data == 'Reconnect':
         try:
             ser.open()
             bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id, text='Подключено')
-        except:
+        except Exception as e_ser:
+            logging.exception(e_ser)
             try:
-                reconnect = types.InlineKeyboardMarkup()
+                recon_button = types.InlineKeyboardMarkup()
                 callback_button = types.InlineKeyboardButton(text='Reconnect', callback_data='Reconnect')
-                reconnect.add(callback_button)
+                recon_button.add(callback_button)
                 bot.edit_message_text(chat_id=c.message.chat.id, message_id=c.message.message_id,
-                                      text='Повторите попытку', reply_markup=reconnect)
-            except:
+                                      text='Повторите попытку', reply_markup=recon_button)
+            except Exception as e_recon:
+                logging.exception(e_recon)
                 print("")
 
 
-@bot.message_handler(func=lambda message: True, content_types=['text'])
+@bot.message_handler(func=lambda message: True, content_types=['text'])  # default handler
 def echo_msg(message):
     bot.send_message(message.chat.id, 'Выберите действие:', reply_markup=markup)
 
 
-def error(message):
+def error(message):   # connection error
     ser.close()
-    reconnect = types.InlineKeyboardMarkup()
+    recon_button = types.InlineKeyboardMarkup()
     callback_button = types.InlineKeyboardButton(text='Reconnect', callback_data='Reconnect')
-    reconnect.add(callback_button)
-    bot.send_message(message.chat.id, 'Ошибка чтения данных\nПерепроверьте подключение Arduino', reply_markup=reconnect)
+    recon_button.add(callback_button)
+    bot.send_message(message.chat.id, 'Ошибка чтения данных\nПерепроверьте подключение Arduino',
+                     reply_markup=recon_button)
 
 
-def delay_set(message):
+def delay_set(message):   # set delay for notifications
     try:
         delay = message.text
         if not delay.isdigit():
@@ -103,11 +107,12 @@ def delay_set(message):
         with open('config.ini', 'w') as config:
             conf.write(config)
         message = bot.reply_to(message, 'Задержка установлена!', reply_markup=markup)
-    except Exception as e:
+    except Exception as e_delay:
+        logging.exception(e_delay)
         bot.reply_to(message, 'Ой, словили баг')
 
 
-def get_eggs():
+def get_eggs():   # get 'eggs' from serial
     i = 7
     while i == 7:
         try:
@@ -118,11 +123,12 @@ def get_eggs():
                 i += 1
             if i != 7:
                 return tmp[i + 1]  # e3m400e6
-        except:
+        except Exception as e_eggs:
+            logging.exception(e_eggs)
             return "err"
 
 
-def get_milk():
+def get_milk():   # get 'milk' from serial
     i = 5
     while i == 5:
         try:
@@ -133,11 +139,12 @@ def get_milk():
                 i += 1
             if i != 5:
                 return tmp[i + 1:i + 4]  # e3m400e6
-        except:
+        except Exception as e_milk:
+            logging.exception(e_milk)
             return "err"
 
 
-def notification():
+def notification():   # notifications sender
     delay = int(setting['DELAY'])
     time.sleep(delay*60)
     users = open('users.txt', 'r')
@@ -161,6 +168,7 @@ if __name__ == '__main__':
             threading.Thread(target=bot.polling).start()
             while True:
                 notification()
-        except:
+        except Exception as e_launch:
+            logging.exception(e_launch)
             print('Bot relaunched\n')
             continue

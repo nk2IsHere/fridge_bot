@@ -7,6 +7,8 @@ import threading
 import time
 import logging
 
+users_path = '/home/pi/Documents/fridge_bot/users.txt' # path to users.txt
+
 conf_path = '/home/pi/Documents/fridge_bot/config.ini'  # path to config
 conf = configparser.ConfigParser()  # connect config
 conf.read(conf_path)
@@ -23,11 +25,11 @@ markup.row('⚙Настройки')
 
 @bot.message_handler(commands=['start'])  # '/start' command handler
 def subscribe_chat(message):
-    users = open('users.txt', 'r')
+    users = open(users_path, 'r')
     if (str(message.chat.id) + '\n') in users:
         bot.send_message(message.chat.id, 'Бот уже запущен')
     else:
-        users = open('users.txt', 'a')
+        users = open(users_path, 'a')
         users.write(str(message.chat.id) + '\n')
         bot.reply_to(message, 'Запуск бота...')
         time.delay(3)
@@ -104,7 +106,7 @@ def delay_set(message):   # set delay for notifications
             bot.register_next_step_handler(msg, delay_set)
             return
         conf.set('Setting', 'delay', delay)
-        with open('config.ini', 'w') as config:
+        with open(conf_path, 'w') as config:
             conf.write(config)
         message = bot.reply_to(message, 'Задержка установлена!', reply_markup=markup)
     except Exception as e_delay:
@@ -143,7 +145,7 @@ def get_milk():   # get 'milk' from serial
 def notification():   # notifications sender
     delay = int(setting['DELAY'])
     time.sleep(delay*60)
-    users = open('users.txt', 'r')
+    users = open(users_path, 'r')
     print('SEND')
     eggs = get_eggs()
     milk = get_milk()

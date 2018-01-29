@@ -13,7 +13,7 @@ conf.read(conf_path)
 setting = conf['Setting']
 
 bot = telebot.TeleBot(setting['TOKEN'])  # telegram bot setup
-ser = serial.Serial(setting['PORT'], setting['BAUD'])  # serial setup
+ser = serial.Serial(setting['PORT'], setting['BAUD'], timeout=1)  # serial setup
 
 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # main menu
 hide = types.ReplyKeyboardRemove()
@@ -113,32 +113,28 @@ def delay_set(message):   # set delay for notifications
 
 
 def get_eggs():   # get 'eggs' from serial
-    i = 7
-    while i == 7:
+    i = 1
+    while i == 1:
         try:
-            tmp = ser.read(8)  # read 8 bytes
+            ser.write(b'e')
+            time.sleep(0.5)
+            tmp = ser.read(1)  # read 8 bytes
             tmp = tmp.decode(errors='ignore')
-            i = 0
-            while (tmp[i] != 'e') & (i < 7):
-                i += 1
-            if i != 7:
-                return tmp[i + 1]  # e3m400e6
+            return tmp  # e3m400e6
         except Exception as e_eggs:
             logging.exception(e_eggs)
             return "err"
 
 
 def get_milk():   # get 'milk' from serial
-    i = 5
-    while i == 5:
+    i = 1
+    while i == 1:
         try:
-            tmp = ser.read(8)  # read 8 bytes
+            ser.write(b'm')
+            time.sleep(0.5)
+            tmp = ser.read(3)  # read 8 bytes
             tmp = tmp.decode(errors='ignore')
-            i = 0
-            while (tmp[i] != 'm') & (i < 5):
-                i += 1
-            if i != 5:
-                return tmp[i + 1:i + 4]  # e3m400e6
+            return tmp  # e3m400e6
         except Exception as e_milk:
             logging.exception(e_milk)
             return "err"

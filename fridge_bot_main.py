@@ -119,7 +119,7 @@ def get_eggs():   # get 'eggs' from serial
             tmp = ser.read(8)  # read 8 bytes
             tmp = tmp.decode(errors='ignore')
             i = 0
-            while (tmp[i] != 'm') & (i < 7):
+            while (tmp[i] != 'e') & (i < 7):
                 i += 1
             if i != 7:
                 return tmp[i + 1]  # e3m400e6

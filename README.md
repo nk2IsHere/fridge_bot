@@ -6,7 +6,7 @@ Send Smart Fridge data from Arduino to Telegram bot.
 
 1. Make 'config.ini' file (copy it from 'config_example.ini') and write your Telegram bot token
 
-1. Write your config path to 'fridge_bot_main.py'
+1. Write your config path to  'fridge_bot_main.py'
 
 1. Upload script to Raspberry
 

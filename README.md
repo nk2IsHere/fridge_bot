@@ -21,8 +21,7 @@ Send Smart Fridge data from Arduino to Telegram bot.
 * 'pyTelegramBotAPI' library
 * 'serial' library
 * 'OpenCV' library
-
-—----
+***
 <h2> Files: </h2>
 
 * 'fridge_bot_main.py' - Main python script

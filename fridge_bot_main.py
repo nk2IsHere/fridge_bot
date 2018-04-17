@@ -6,7 +6,7 @@ import serial
 import threading
 import time
 import logging
-<<<<<<< HEAD
+
 from detect_contour import get_tomato
 from detect_contour import cam_init
 import numpy as np
@@ -21,7 +21,7 @@ conf_path = 'C:/Users/Denis/Documents/drive/Google Drive/Projects/Холодил
 users_path = '/home/pi/Documents/fridge_bot/users.txt' # path to users.txt
 
 conf_path = '/home/pi/Documents/fridge_bot/config.ini'  # path to config
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
 conf = configparser.ConfigParser()  # connect config
 conf.read(conf_path)
 setting = conf['Setting']
@@ -32,12 +32,9 @@ ser = serial.Serial(setting['PORT'], setting['BAUD'], timeout=1)  # serial setup
 markup = types.ReplyKeyboardMarkup(resize_keyboard=True)  # main menu
 hide = types.ReplyKeyboardRemove()
 markup.row('🥛Молоко', '🥚Яйца')
-<<<<<<< HEAD
 markup.row('🌾Мука', '🍚Рис')
 markup.row('🍅Помидоры', '⚙Настройки')
-=======
 markup.row('⚙Настройки')
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
 
 
 @bot.message_handler(commands=['start'])  # '/start' command handler
@@ -54,7 +51,7 @@ def subscribe_chat(message):
     users.close()
 
 
-<<<<<<< HEAD
+
 @bot.message_handler(func=lambda message: message.text == '🥛Молоко')  # milk handler
 def milk_send(message):
     milk = get_milk()
@@ -64,8 +61,8 @@ def milk_send(message):
         bot.send_message(message.chat.id, 'Осталось молока: ' + milk + ' мл')
 
 
-=======
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
+
 @bot.message_handler(func=lambda message: message.text == '🥚Яйца')  # eggs handler
 def eggs_send(message):
     eggs = get_eggs()
@@ -73,7 +70,7 @@ def eggs_send(message):
         bot.register_next_step_handler(message, error)
     else:
         bot.send_message(message.chat.id, 'Осталось яиц: ' + eggs + ' шт.')
-<<<<<<< HEAD
+
 
 
 @bot.message_handler(func=lambda message: message.text == '🌾Мука')  # flour handler
@@ -101,7 +98,7 @@ def tomato_send(message):
         bot.register_next_step_handler(message, error)
     else:
         bot.send_message(message.chat.id, 'Осталось помидоров: ' + tomato + ' шт.')
-=======
+
     # curtime = datetime.datetime.now().strftime('%H:%M:%S %d-%m-%Y')
     # bot.send_message(message.chat.id, 'Temperature: ' + temp + ' °C\n' + 'Time: ' + curtime)
 
@@ -113,7 +110,7 @@ def milk_send(message):
         bot.register_next_step_handler(message, error)
     else:
         bot.send_message(message.chat.id, 'Осталось молока: ' + milk + ' мл')
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
 
 
 @bot.message_handler(func=lambda message: message.text == '⚙Настройки')  # settings handler
@@ -148,11 +145,11 @@ def echo_msg(message):
     bot.send_message(message.chat.id, 'Выберите действие:', reply_markup=markup)
 
 
-<<<<<<< HEAD
 
 
-=======
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
+
+
 def error(message):   # connection error
     ser.close()
     recon_button = types.InlineKeyboardMarkup()
@@ -179,7 +176,7 @@ def delay_set(message):   # set delay for notifications
 
 
 def get_eggs():   # get 'eggs' from serial
-<<<<<<< HEAD
+
     try:
         ser.write(b'e')
         time.sleep(0.5)
@@ -230,7 +227,7 @@ def get_rice():   # get 'rice' from serial
 def get_tomato():    # get 'tomato' from camera
     tomato = get_tomato()
     return tomato
-=======
+
     i = 1
     while i == 1:
         try:
@@ -256,7 +253,7 @@ def get_milk():   # get 'milk' from serial
         except Exception as e_milk:
             logging.exception(e_milk)
             return "err"
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
 
 
 def notification():   # notifications sender
@@ -266,29 +263,29 @@ def notification():   # notifications sender
     print('SEND')
     eggs = get_eggs()
     milk = get_milk()
-<<<<<<< HEAD
+
     tomato = get_tomato()
     rice = get_rice()
     flour = get_flour()
     print(milk + ' ' + eggs + ' ' + tomato + ' ' + rice + ' ' + flour)
-=======
+
     print(milk + ' ' + eggs)
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
     for user in users:
         user_id = int(user[:-1])
         if int(eggs) < 3:
             bot.send_message(user_id, 'Яйца заканчиваются\nОсталось: ' + eggs + ' шт.', reply_markup=markup)
         if int(milk) < 300:
             bot.send_message(user_id, 'Молоко заканчивается\nОсталось: ' + milk + ' мл', reply_markup=markup)
-<<<<<<< HEAD
+
         if int(rice) < 300:
             bot.send_message(user_id, 'Рис заканчивается\nОсталось: ' + rice + ' гр', reply_markup=markup)
         if int(flour) < 300:
             bot.send_message(user_id, 'Мука заканчивается\nОсталось: ' + flour + ' гр', reply_markup=markup)
         if int(tomato) < 2:
             bot.send_message(user_id, 'Помидоры заканчиваются\nОсталось: ' + tomato + ' шт. ', reply_markup=markup)
-=======
->>>>>>> 4c5fe8738f7e5ea53c531f40e8b9fe1917bfbaa1
+
+
     users.close()
 
 

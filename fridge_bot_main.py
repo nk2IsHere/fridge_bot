@@ -10,11 +10,18 @@ from detect_contour import get_tomato
 from detect_contour import cam_init
 import numpy as np
 import cv2 as cv
+from telebot import apihelper
+proxies = {
+    'http': 'socks5://PROXY_5AD64B206FC28:72ab81839c99f96a@par4.google.v98nXNmRTPF8t0Oe1J4dcy4TLg636jiV.proxy.veesecurity.com:443',
+    'https': 'socks5://PROXY_5AD64B206FC28:72ab81839c99f96a@par4.google.v98nXNmRTPF8t0Oe1J4dcy4TLg636jiV.proxy.veesecurity.com:443'
+}
 
-users_path = 'C:/Users/Denis/Documents/drive/Google Drive/Projects/Холодильник/fridge_bot/users.txt'  # path to users.txt
+users_path = '/home/pi/Documents/fridge_bot/users.txt'  # path to users.txt
+#users_path = 'C:/Users/Denis/Documents/drive/Google Drive/Projects/Холодильник/fridge_bot/users.txt'  # path to users.txt
 cam_init()
 
-conf_path = 'C:/Users/Denis/Documents/drive/Google Drive/Projects/Холодильник/fridge_bot/config.ini'  # path to config
+conf_path = '/home/pi/Documents/fridge_bot/config.ini'  # path to config
+#conf_path = 'C:/Users/Denis/Documents/drive/Google Drive/Projects/Холодильник/fridge_bot/config.ini'  # path to config
 conf = configparser.ConfigParser()  # connect config
 conf.read(conf_path)
 setting = conf['Setting']
